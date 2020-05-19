@@ -21,12 +21,12 @@ class HomeScreen extends StatelessWidget {
                     children: <Widget>[
                       Text(
                         'Benvenuto, ${snapshot.data[0]}',
-                        style: TextStyle(fontSize: 23.0),
+                        style: TextStyle(fontSize: 22.0),
                       ),
                       SizedBox(height: 10.0),
                       Text(
                         'Il tuo ID è ${snapshot.data[1]}',
-                        style: TextStyle(fontSize: 23.0),
+                        style: TextStyle(fontSize: 22.0),
                       )
                     ],
                   ),
