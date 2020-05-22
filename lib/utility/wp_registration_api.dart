@@ -1,9 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_wordpress/flutter_wordpress.dart' as wp;
-import 'package:flutter_wp_test/utility/auth_form_state.dart';
 import 'package:http/http.dart' as http;
-import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class WpRegistration {
   final wp.WordPress wordPress = wp.WordPress(
@@ -46,43 +45,33 @@ class WpRegistration {
     });
   }
 
-  Future<http.Response> getToken(
+  Future<String> getToken(
       String username, String password, BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
     // final http.Response response = await http.post('https://www.wokguides.com/wp-json/jwt-auth/v1/token?username=$username&password=$password');
     // print(response.statusCode);
-    // return response;
     var url =
         'https://testwpflutter.000webhostapp.com/wp-json/jwt-auth/v1/token';
-    // var authorization = 'Basic ' +
-    //     base64Encode(utf8.encode(
-    //         '$username:$password'));
+
     var body = jsonEncode({'username': username, 'password': password});
 
-    http
-        .post(url,
-            headers: {
-              "Content-Type": "application/json",
-              // 'Authorization': authorization
-            },
-            body: body)
-        .then((http.Response response) {
-      final int statusCode = response.statusCode;
-      // print(json.decode('${response.body}'));
-      Map<String, dynamic> responseJson = json.decode('${response.body}');
-      Provider.of<RegisterFormState>(context, listen: false).setToken =
-          responseJson['token'];
+    var result = await http.post(url,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: body);
+    final int statusCode = result.statusCode;
+    Map<String, dynamic> responseJson = json.decode('${result.body}');
 
-      //Funziona per prendere il token direttamente da provider
-      // String a =
-      //     (Provider.of<RegisterFormState>(context, listen: false).getToken);
-      //     print(a);
-    });
+    prefs.setString('token', responseJson['token']);
+
+    return statusCode == 403 ? responseJson['code'] : responseJson['token'];
   }
 
   Future<String> getUserNickname(BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
     var url = 'https://testwpflutter.000webhostapp.com/wp-json/wp/v2/users/me';
-    String token =
-        Provider.of<RegisterFormState>(context, listen: false).getToken;
+    String token = prefs.getString('token');
 
     var result = await http.get(url, headers: {
       "Content-Type": "application/json",
@@ -91,13 +80,14 @@ class WpRegistration {
 
     // final int statusCode = result.statusCode;
     Map<String, dynamic> responseJson = json.decode('${result.body}');
+    print(responseJson.toString());
     return responseJson['name'];
   }
 
   Future<int> getUserId(BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
     var url = 'https://testwpflutter.000webhostapp.com/wp-json/wp/v2/users/me';
-    String token =
-        Provider.of<RegisterFormState>(context, listen: false).getToken;
+    String token = prefs.getString('token');
 
     var result = await http.get(url, headers: {
       "Content-Type": "application/json",
@@ -107,5 +97,24 @@ class WpRegistration {
     // final int statusCode = result.statusCode;
     Map<String, dynamic> responseJson = json.decode('${result.body}');
     return responseJson['id'];
+  }
+
+  Future<int> registerUser(
+      String username, String password, String email) async {
+    var url =
+        'https://testwpflutter.000webhostapp.com/wp-json/wp/v2/users/register';
+
+    var body = jsonEncode(
+        {'username': username, 'password': password, 'email': email});
+
+    var result = await http.post(url,
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: body);
+    final int statusCode = result.statusCode;
+    Map<String, dynamic> responseJson = json.decode('${result.body}');
+
+    return responseJson['code'];
   }
 }

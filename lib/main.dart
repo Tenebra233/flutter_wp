@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_wp_test/screens/home_page.dart';
 import 'package:flutter_wp_test/screens/login_screen.dart';
 import 'package:flutter_wp_test/utility/auth_form_state.dart';
 import 'package:flutter_wp_test/utility/wp_registration_api.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  final WpRegistration auth = WpRegistration();
+  SharedPreferences sharedPrefs;
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -19,8 +23,21 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: LoginScreen(),
+        home: FutureBuilder(
+            future: _getPrefs(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData && snapshot.data!=null) {
+                return HomeScreen();
+              } else {
+                return LoginScreen();
+              }
+            }),
       ),
     );
+  }
+
+  Future<String> _getPrefs() async {
+    sharedPrefs = await SharedPreferences.getInstance();
+    return sharedPrefs.getString('token');
   }
 }

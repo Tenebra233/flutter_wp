@@ -1,6 +1,11 @@
+import 'package:argon_buttons_flutter/argon_buttons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:flutter_wp_test/screens/login_screen.dart';
+import 'package:flutter_wp_test/utility/auth_form_state.dart';
 import 'package:flutter_wp_test/utility/wp_registration_api.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatelessWidget {
   final WpRegistration wp = WpRegistration();
@@ -27,7 +32,38 @@ class HomeScreen extends StatelessWidget {
                       Text(
                         'Il tuo ID è ${snapshot.data[1]}',
                         style: TextStyle(fontSize: 22.0),
-                      )
+                      ),
+                      SizedBox(height: 20.0),
+                      ArgonButton(
+                          height: 50,
+                          width: 350,
+                          borderRadius: 5.0,
+                          color: Colors.black,
+                          child: Text(
+                            "Disconnetti",
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 18,
+                                fontWeight: FontWeight.w700),
+                          ),
+                          loader: Container(
+                            padding: EdgeInsets.all(10),
+                            child: SpinKitRotatingCircle(
+                              color: Colors.white,
+                              // size: loaderWidth ,
+                            ),
+                          ),
+                          onTap: (startLoading, stopLoading, btnState) async {
+                            startLoading();
+                            final prefs = await SharedPreferences.getInstance();
+                            prefs.remove('token');
+                            stopLoading();
+                            Navigator.pushReplacement(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => LoginScreen()),
+                            );
+                          })
                     ],
                   ),
                 );

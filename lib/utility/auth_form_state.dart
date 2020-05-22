@@ -6,6 +6,10 @@ class RegisterFormState extends ChangeNotifier {
   TextEditingController _username;
   TextEditingController _password;
   String _token;
+  String _errorToastMessage;
+
+  //Stringa che vale 0 o 1
+  String _loginStatusCodeError;
 
   TextEditingController get getEmail {
     return _email;
@@ -21,6 +25,22 @@ class RegisterFormState extends ChangeNotifier {
 
   String get getToken {
     return _token;
+  }
+
+  String get getErrorToastMessage {
+    return _errorToastMessage;
+  }
+
+  String get getLoginStatusCodeError {
+    return _loginStatusCodeError;
+  }
+
+  set setLoginStatusCodeError(error) {
+    _loginStatusCodeError = error;
+  }
+
+  set setErrorToastMessage(message) {
+    _errorToastMessage = message;
   }
 
   set setToken(token) {
