@@ -1,10 +1,13 @@
+import 'dart:io';
+
 import 'package:argon_buttons_flutter/argon_buttons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:flutter_wp_test/snackbar_notices_message/snackbar_error.dart';
+import 'package:flutter_wp_test/snackbar_notices_message/successful_registration.dart';
 import 'package:flutter_wp_test/utility/wp_registration_api.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_wp_test/utility/auth_form_state.dart';
-import 'package:connectivity/connectivity.dart';
 import 'package:flutter_wp_test/screens/login_screen.dart';
 
 class RegisterScreen extends StatelessWidget {
@@ -88,15 +91,17 @@ class RegisterScreen extends StatelessWidget {
                   ),
                   onTap: (startLoading, stopLoading, btnState) async {
                     startLoading();
-                    var connectivityResult =
-                        await (Connectivity().checkConnectivity());
-                    if (connectivityResult != ConnectivityResult.wifi &&
-                        connectivityResult != ConnectivityResult.mobile) {
+                    final result = await InternetAddress.lookup('example.com');
+                    if (result.isEmpty || result[0].rawAddress.isEmpty) {
                       globalKey.currentState.removeCurrentSnackBar();
+                      Provider.of<RegisterFormState>(context, listen: false)
+                              .setErrorToastMessage =
+                          'Non sei connesso ad una rete Internet!';
 
                       final snackBar = SnackBar(
-                        content: NoInternetError(),
+                        content: SnackBarErrorMessage(),
                       );
+                      stopLoading();
                       globalKey.currentState.showSnackBar(snackBar);
                     } else {
                       WpRegistration auth = WpRegistration();
@@ -161,7 +166,6 @@ class RegisterScreen extends StatelessWidget {
                           );
                           break;
                       }
-
                       stopLoading();
                     }
                   })
@@ -169,79 +173,6 @@ class RegisterScreen extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-class NoInternetError extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Icon(
-          Icons.error,
-          color: Colors.red,
-        ),
-        SizedBox(
-          width: 10.0,
-        ),
-        Text(
-          'Non sei connesso ad una rete Internet!',
-          style: TextStyle(
-            color: Colors.white,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class SnackBarErrorMessage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Icon(
-          Icons.error,
-          color: Colors.red,
-        ),
-        SizedBox(
-          width: 10.0,
-        ),
-        Text(
-          Provider.of<RegisterFormState>(context, listen: false)
-              .getErrorToastMessage,
-          style: TextStyle(
-            color: Colors.white,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class SuccessfulRegistrationSnackBar extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Icon(
-          Icons.check,
-          color: Colors.green,
-        ),
-        SizedBox(
-          width: 10.0,
-        ),
-        Text(
-          'Registrazione avvenuta con successo',
-          style: TextStyle(
-            color: Colors.white,
-          ),
-        ),
-      ],
     );
   }
 }

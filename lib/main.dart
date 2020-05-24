@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_wp_test/screens/home_page.dart';
+import 'package:flutter_wp_test/screens/image_upload.dart';
 import 'package:flutter_wp_test/screens/login_screen.dart';
 import 'package:flutter_wp_test/utility/auth_form_state.dart';
-import 'package:flutter_wp_test/utility/wp_registration_api.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -26,10 +26,10 @@ class MyApp extends StatelessWidget {
         home: FutureBuilder(
             future: _getPrefs(),
             builder: (context, snapshot) {
-              if (snapshot.hasData && snapshot.data!=null) {
-                return HomeScreen();
+              if (snapshot.hasData && snapshot.data != null) {
+                return ImageUpload();
               } else {
-                return LoginScreen();
+                return ImageUpload();
               }
             }),
       ),

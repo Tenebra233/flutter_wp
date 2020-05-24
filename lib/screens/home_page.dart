@@ -1,10 +1,12 @@
+import 'dart:async';
+
 import 'package:argon_buttons_flutter/argon_buttons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_wp_test/screens/login_screen.dart';
-import 'package:flutter_wp_test/utility/auth_form_state.dart';
+import 'package:flutter_wp_test/screens/map_screen.dart';
 import 'package:flutter_wp_test/utility/wp_registration_api.dart';
-import 'package:provider/provider.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -33,6 +35,20 @@ class HomeScreen extends StatelessWidget {
                         'Il tuo ID è ${snapshot.data[1]}',
                         style: TextStyle(fontSize: 22.0),
                       ),
+                      SizedBox(height: 20.0),
+                      FlatButton.icon(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                  builder: (context) => MapScreen()),
+                            );
+                          },
+                          icon: Icon(Icons.map),
+                          label: Text(
+                            'Vai alla mappa',
+                            style: TextStyle(fontSize: 25.0),
+                          )),
                       SizedBox(height: 20.0),
                       ArgonButton(
                           height: 50,

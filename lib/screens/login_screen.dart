@@ -1,14 +1,15 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:argon_buttons_flutter/argon_buttons_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_wp_test/screens/home_page.dart';
 import 'package:flutter_wp_test/screens/registration_screen.dart';
+import 'package:flutter_wp_test/snackbar_notices_message/snackbar_error.dart';
 import 'package:flutter_wp_test/utility/auth_form_state.dart';
 import 'package:flutter_wp_test/utility/wp_registration_api.dart';
 import 'package:provider/provider.dart';
-import 'package:connectivity/connectivity.dart';
 
 class LoginScreen extends StatelessWidget {
   final _usernameController = TextEditingController();
@@ -91,14 +92,12 @@ class LoginScreen extends StatelessWidget {
                     globalKey.currentState.removeCurrentSnackBar();
                     startLoading();
 
-                    var connectivityResult =
-                        await (Connectivity().checkConnectivity());
-                    if (connectivityResult != ConnectivityResult.wifi &&
-                        connectivityResult != ConnectivityResult.mobile) {
+                    final result = await InternetAddress.lookup('example.com');
+                    if (result.isEmpty || result[0].rawAddress.isEmpty) {
+                      globalKey.currentState.removeCurrentSnackBar();
                       Provider.of<RegisterFormState>(context, listen: false)
                               .setErrorToastMessage =
                           'Non sei connesso ad una rete Internet!';
-                      stopLoading();
 
                       final snackBar = SnackBar(
                         content: SnackBarErrorMessage(),
@@ -154,31 +153,6 @@ class LoginScreen extends StatelessWidget {
           ),
         ),
       ),
-    );
-  }
-}
-
-class SnackBarErrorMessage extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Icon(
-          Icons.error,
-          color: Colors.red,
-        ),
-        SizedBox(
-          width: 10.0,
-        ),
-        Text(
-          Provider.of<RegisterFormState>(context, listen: false)
-              .getErrorToastMessage,
-          style: TextStyle(
-            color: Colors.white,
-          ),
-        ),
-      ],
     );
   }
 }
